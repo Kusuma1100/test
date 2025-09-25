@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Ujian HSK Online</title>
+    <title>Sistem TryOut HSK Online KUSUMA</title>
     <style>
         * {
             margin: 0;
@@ -453,13 +453,16 @@
         <div class="warning-content">
             <h2>🚫 PELANGGARAN TERDETEKSI!</h2>
             <p>Anda telah melanggar peraturan ujian dengan keluar dari halaman. Ujian telah diblokir.</p>
-            <p><strong>Silakan hubungi pengawas untuk mendapatkan kode pembuka blokir.</strong></p>
+            <p><strong>Silakan hubungi pengawas untuk mendapatkan kode pembuka blokir bagian <span id="blocked-section-name">ini</span>.</strong></p>
             <div class="form-group">
-                <label for="unlock-code">Masukkan Kode Pembuka:</label>
+                <label for="unlock-code">Masukkan Kode Pembuka untuk <span id="unlock-section-label">bagian ini</span>:</label>
                 <input type="text" id="unlock-code" placeholder="Kode dari pengawas">
             </div>
             <button class="btn" onclick="unlockExam()">Buka Blokir</button>
             <div id="unlock-error" class="error-message"></div>
+            <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; font-size: 0.9em; color: #7f8c8d;">
+                💡 <strong>Hint:</strong> Setiap bagian punya kode berbeda - tanyakan ke pengawas
+            </div>
         </div>
     </div>
 
@@ -468,7 +471,7 @@
         <div id="login-page" class="page active">
             <div class="card">
                 <div class="header">
-                    <h1>🎓 Sistem Ujian HSK Online</h1>
+                    <h1>🎓 Sistem TryOut HSK Online KUSUMA</h1>
                     <p>Masukkan password untuk memulai ujian</p>
                 </div>
                 
@@ -495,9 +498,9 @@
                     <h3>⏰ Informasi Ujian</h3>
                     <ul>
                         <li><strong>3 Bagian Ujian:</strong> Listening (听力), Reading (阅读), Writing (书写)</li>
-                        <li><strong>Total Durasi:</strong> 90 menit untuk semua bagian</li>
+                        <li><strong>Durasi per Bagian:</strong> Listening 35 menit, Reading 30 menit, Writing 15 menit</li>
                         <li><strong>Waktu Mulai:</strong> Timer akan dimulai otomatis</li>
-                        <li><strong>Penyimpanan Otomatis:</strong> Jawaban tersimpan otomatis</li>
+                        <li><strong>Penyimpanan Otomatis:</strong> Jawaban tersimpan otomatis dengan catatan sudah kirim jawabannya</li>
                     </ul>
                 </div>
 
@@ -509,7 +512,17 @@
                         <li>DILARANG keras untuk keluar dari aplikasi/website</li>
                         <li>DILARANG berkomunikasi dengan orang lain</li>
                         <li>DILARANG bersuara saat ujian dimulai</li>
-                        <li>DILARANG menggunakan TWS atau earphon, headset sejenisnya</li>
+                        <li>DILARANG menggunakan TWS atau earphone, headset sejenisnya</li>
+                    </ul>
+                </div>
+
+                <div class="rules-container">
+                    <h3>🔐 Sistem Keamanan</h3>
+                    <ul>
+                        <li><strong>Password Utama:</strong> Untuk masuk ke sistem ujian</li>
+                        <li><strong>Password Bagian:</strong> Setiap bagian ujian memiliki password khusus</li>
+                        <li><strong>Kode Unlock:</strong> Setiap bagian memiliki kode pembuka blokir yang berbeda dan masing masing siswa/i hanya diberi 1x code pemblokiran jika melebihi itu maka akan dicurigai melakukan tindak kecurangan</li>
+                        <li><strong>Keamanan Berlapis:</strong> 3 tingkat keamanan untuk melindungi integritas ujian</li>
                     </ul>
                 </div>
 
@@ -518,13 +531,12 @@
                     <ul>
                         <li>Sistem akan mendeteksi jika Anda keluar dari halaman ujian</li>
                         <li>Pelanggaran pertama akan mengunci ujian</li>
-                        <li>Anda harus meminta kode pembuka dari pengawas</li>
+                        <li>Setiap bagian ujian memiliki kode pembuka yang berbeda</li>
+                        <li>Anda harus meminta kode pembuka dari pengawas sesuai bagian yang sedang dikerjakan</li>
                         <li>Setiap siswa hanya dapat mengulang ujian MAKSIMAL 1 kali</li>
                         <li>Pelanggaran kedua akan mengakibatkan diskualifikasi</li>
                     </ul>
                 </div>
-
-                <div class="checkbox-container">
                     <input type="checkbox" id="agree-rules">
                     <label for="agree-rules">Saya telah membaca dan menyetujui semua peraturan di atas</label>
                 </div>
@@ -535,7 +547,47 @@
             </div>
         </div>
 
-        <!-- NEW: Halaman 3: Pemilihan Bagian -->
+        <!-- NEW: Halaman Password Bagian -->
+        <div id="section-password-page" class="page">
+            <div class="card">
+                <div class="header">
+                    <h1 id="section-password-title">🔐 Password Bagian</h1>
+                    <p id="section-password-desc">Masukkan password untuk bagian yang dipilih</p>
+                </div>
+
+                <div id="selected-section-info" class="rules-container" style="text-align: center; margin: 30px 0;">
+                    <span id="section-icon-display" style="font-size: 4em; display: block; margin-bottom: 10px;">📝</span>
+                    <h2 id="section-name-display" style="color: #2c3e50; margin-bottom: 10px;">Bagian Ujian</h2>
+                    <p id="section-duration-display" style="color: #7f8c8d;">⏱️ Durasi: -- menit</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="section-password">Password Bagian:</label>
+                    <input type="password" id="section-password" placeholder="Masukkan password bagian ini">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn back-btn" onclick="backToSectionSelection()">
+                        ⬅️ Kembali
+                    </button>
+                    <button class="btn" onclick="validateSectionPassword()">
+                        🚀 Masuk ke Ujian
+                    </button>
+                </div>
+                
+                <div id="section-password-error" class="error-message"></div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #3498db;">
+                    <h4 style="color: #2c3e50; margin-bottom: 10px;">💡 Info Penting:</h4>
+                    <ul style="color: #7f8c8d; line-height: 1.6; margin: 0; padding-left: 20px;">
+                        <li>Setiap bagian ujian memiliki password yang berbeda</li>
+                        <li>Tanyakan password ke pengawas jika diperlukan</li>
+                        <li>Password case-sensitive (huruf besar/kecil berpengaruh)</li>
+                        <li>Timer akan dimulai setelah berhasil masuk</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <div id="section-selection-page" class="page">
             <div class="card">
                 <div class="header">
@@ -544,25 +596,28 @@
                 </div>
 
                 <div class="section-grid">
-                    <div class="section-card listening" onclick="startSection('listening')">
+                    <div class="section-card listening" onclick="selectSection('listening')">
                         <span class="section-icon">🎧</span>
                         <div class="section-title">Listening</div>
                         <div class="section-subtitle">听力 - Kemampuan Mendengar</div>
-                        <div class="section-duration">⏱️ 30 menit</div>
+                        <div class="section-duration">⏱️ 35 menit</div>
+                        <div style="margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">🔐 Butuh password khusus</div>
                     </div>
 
-                    <div class="section-card reading" onclick="startSection('reading')">
+                    <div class="section-card reading" onclick="selectSection('reading')">
                         <span class="section-icon">📖</span>
                         <div class="section-title">Reading</div>
                         <div class="section-subtitle">阅读 - Kemampuan Membaca</div>
                         <div class="section-duration">⏱️ 30 menit</div>
+                        <div style="margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">🔐 Butuh password khusus</div>
                     </div>
 
-                    <div class="section-card writing" onclick="startSection('writing')">
+                    <div class="section-card writing" onclick="selectSection('writing')">
                         <span class="section-icon">✍️</span>
                         <div class="section-title">Writing</div>
                         <div class="section-subtitle">书写 - Kemampuan Menulis</div>
-                        <div class="section-duration">⏱️ 30 menit</div>
+                        <div class="section-duration">⏱️ 15 menit</div>
+                        <div style="margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">🔐 Butuh password khusus</div>
                     </div>
                 </div>
 
@@ -622,16 +677,36 @@
     <script>
         // KONFIGURASI UJIAN - UBAH DI SINI
         const CONFIG = {
-            examPassword: 'UJIANHSK3', // 🔧 UBAH PASSWORD DI SINI
-            examDuration: 30 * 60, // 🔧 UBAH DURASI (dalam detik) - sekarang 30 menit per bagian
-            unlockCode: 'KUSUMAHSK3', // 🔧 UBAH KODE UNLOCK DI SINI
+            examPassword: 'KUSUMATryOut2025', // 🔧 UBAH PASSWORD UTAMA DI SINI
+            
+            // 🔧 UBAH PASSWORD PER BAGIAN DI SINI
+            sectionPasswords: {
+                listening: ' TryOutKUSUMA1100',  // Password untuk masuk Listening
+                reading: 'TryOutKUSUMA8914',      // Password untuk masuk Reading
+                writing: 'TryOutKUSUMA1902'      // Password untuk masuk Writing
+            },
+            
+            // 🔧 UBAH DURASI PER BAGIAN (dalam menit)
+            sectionDurations: {
+                listening: 35, // 30 menit untuk Listening
+                reading: 30,   // 40 menit untuk Reading
+                writing: 15    // 35 menit untuk Writing
+            },
+            
+            // 🔧 UBAH KODE UNLOCK PER BAGIAN DI SINI
+            unlockCodes: {
+                listening: 'Listening1100',  // Kode untuk Listening
+                reading: 'Reading1984',      // Kode untuk Reading
+                writing: 'Writing1209'      // Kode untuk Writing
+            },
+            
             maxRetries: 1, // 🔧 UBAH MAKSIMAL PERCOBAAN ULANG
             
             // 🔧 UBAH URL GOOGLE FORM DI SINI - SATU FORM UNTUK SEMUA BAGIAN
             googleFormUrls: {
                 listening: 'https://forms.gle/TVqz9Su3i3TGSrwBA', // Form untuk Listening
-                reading: 'https://forms.gle/TVqz9Su3i3TGSrwBA',   // Form untuk Reading
-                writing: 'https://forms.gle/TVqz9Su3i3TGSrwBA'    // Form untuk Writing
+                reading: 'https://forms.gle/TkUaUQzEBxQpjnQZ9',   // Form untuk Reading
+                writing: 'https://forms.gle/cgx7HbaKb8QRZ2mx6'    // Form untuk Writing
             },
             
             // 🔧 UBAH NAMA BAGIAN DI SINI
@@ -645,7 +720,7 @@
         // State Management
         let examState = {
             isExamActive: false,
-            timeRemaining: CONFIG.examDuration,
+            timeRemaining: 0, // Will be set based on section
             violationCount: 0,
             isLocked: false,
             retryCount: 0,
@@ -661,7 +736,8 @@
             hasStarted: false,
             currentUser: null,
             examBlocked: false,
-            completedSections: []
+            completedSections: [],
+            selectedSection: null // NEW: Untuk menyimpan bagian yang dipilih
         };
 
         // Password validation
@@ -684,12 +760,91 @@
             document.getElementById('start-exam-btn').disabled = !this.checked;
         });
 
+        // NEW: Select section (show password page)
+        function selectSection(sectionType) {
+            examData.selectedSection = sectionType;
+            
+            // Update UI untuk halaman password
+            updateSectionPasswordPage(sectionType);
+            
+            // Show password page
+            showPage('section-password-page');
+        }
+
+        // NEW: Update section password page
+        function updateSectionPasswordPage(sectionType) {
+            const sectionInfo = {
+                listening: {
+                    icon: '🎧',
+                    title: 'Listening 听力',
+                    subtitle: 'Kemampuan Mendengar',
+                    duration: CONFIG.sectionDurations.listening
+                },
+                reading: {
+                    icon: '📖',
+                    title: 'Reading 阅读',
+                    subtitle: 'Kemampuan Membaca',
+                    duration: CONFIG.sectionDurations.reading
+                },
+                writing: {
+                    icon: '✍️',
+                    title: 'Writing 书写',
+                    subtitle: 'Kemampuan Menulis',
+                    duration: CONFIG.sectionDurations.writing
+                }
+            };
+
+            const info = sectionInfo[sectionType];
+            
+            document.getElementById('section-password-title').textContent = `🔐 Password ${info.title}`;
+            document.getElementById('section-password-desc').textContent = `Masukkan password untuk ${info.subtitle}`;
+            document.getElementById('section-icon-display').textContent = info.icon;
+            document.getElementById('section-name-display').textContent = info.title;
+            document.getElementById('section-duration-display').textContent = `⏱️ Durasi: ${info.duration} menit`;
+            
+            // Clear previous input
+            document.getElementById('section-password').value = '';
+            document.getElementById('section-password-error').style.display = 'none';
+        }
+
+        // NEW: Validate section password
+        function validateSectionPassword() {
+            const inputPassword = document.getElementById('section-password').value;
+            const selectedSection = examData.selectedSection;
+            const errorDiv = document.getElementById('section-password-error');
+            
+            if (!selectedSection) {
+                errorDiv.textContent = 'Error: Tidak ada bagian yang dipilih!';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            const correctPassword = CONFIG.sectionPasswords[selectedSection];
+            
+            if (inputPassword === correctPassword) {
+                errorDiv.style.display = 'none';
+                
+                // Show success and start exam
+                setTimeout(() => {
+                    startSection(selectedSection);
+                }, 500);
+                
+                // Show brief success message
+                document.getElementById('section-password-desc').textContent = '✅ Password benar! Memulai ujian...';
+                document.getElementById('section-password-desc').style.color = '#27ae60';
+                
+            } else {
+                const sectionName = CONFIG.sectionNames[selectedSection];
+                errorDiv.textContent = `❌ Password salah untuk ${sectionName}! Silakan coba lagi atau tanyakan ke pengawas.`;
+                errorDiv.style.display = 'block';
+                document.getElementById('section-password').value = '';
+            }
+        }
+
         // NEW: Show section selection
         function showSectionSelection() {
             showPage('section-selection-page');
         }
-
-        // NEW: Start specific section
         function startSection(sectionType) {
             if (examData.examBlocked && examState.retryCount >= CONFIG.maxRetries) {
                 alert('Anda telah melebihi batas percobaan ulang. Ujian tidak dapat dilanjutkan.');
@@ -699,7 +854,9 @@
             examState.currentSection = sectionType;
             examState.isExamActive = true;
             examState.startTime = new Date();
-            examState.timeRemaining = CONFIG.examDuration; // Reset timer untuk setiap bagian
+            
+            // Set timer berdasarkan bagian yang dipilih
+            examState.timeRemaining = CONFIG.sectionDurations[sectionType] * 60; // Convert menit ke detik
             examData.hasStarted = true;
             
             // Update UI
@@ -904,14 +1061,34 @@
             examData.examBlocked = true;
             clearInterval(examState.timerInterval);
             
+            // Update UI untuk menampilkan bagian yang diblokir
+            updateBlockedSectionInfo();
+            
             document.getElementById('warning-overlay').style.display = 'flex';
+        }
+
+        // NEW: Update info bagian yang diblokir
+        function updateBlockedSectionInfo() {
+            const sectionName = examState.currentSection ? CONFIG.sectionNames[examState.currentSection] : 'Unknown';
+            document.getElementById('blocked-section-name').textContent = sectionName;
+            document.getElementById('unlock-section-label').textContent = sectionName;
         }
 
         function unlockExam() {
             const code = document.getElementById('unlock-code').value;
             const errorDiv = document.getElementById('unlock-error');
+            const currentSection = examState.currentSection;
             
-            if (code === CONFIG.unlockCode) {
+            // Cek kode unlock sesuai bagian yang sedang aktif
+            const correctCode = CONFIG.unlockCodes[currentSection];
+            
+            if (!correctCode) {
+                errorDiv.textContent = 'Error: Bagian ujian tidak dikenali!';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (code === correctCode) {
                 examState.retryCount++;
                 
                 if (examState.retryCount > CONFIG.maxRetries) {
@@ -940,8 +1117,14 @@
                 
                 // Request fullscreen again
                 requestFullscreen();
+                
+                // Show success message
+                setTimeout(() => {
+                    alert(`✅ Berhasil membuka blokir untuk ${CONFIG.sectionNames[currentSection]}!`);
+                }, 500);
             } else {
-                errorDiv.textContent = 'Kode salah! Hubungi pengawas untuk mendapatkan kode yang benar.';
+                const sectionName = CONFIG.sectionNames[currentSection];
+                errorDiv.textContent = `❌ Kode salah untuk ${sectionName}! Hubungi pengawas untuk kode yang benar.`;
                 errorDiv.style.display = 'block';
             }
         }
@@ -1053,10 +1236,16 @@
             }
         });
 
-        // Allow Enter key for unlock code
-        document.getElementById('unlock-code').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                unlockExam();
+        // Allow Enter key for section password
+        document.addEventListener('DOMContentLoaded', function() {
+            // Section password enter key
+            const sectionPasswordInput = document.getElementById('section-password');
+            if (sectionPasswordInput) {
+                sectionPasswordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        validateSectionPassword();
+                    }
+                });
             }
         });
     </script>
